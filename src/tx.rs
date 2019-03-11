@@ -35,12 +35,12 @@ pub struct PeginDataInfo {
 	pub outpoint: String,
 	pub value: u64,
 	pub asset: ConfidentialAssetInfo,
-	pub genesis_hash: HexBytes,
+	pub genesis_hash: sha256d::Hash,
 	pub claim_script: HexBytes,
 	pub mainchain_tx_hex: HexBytes,
 	pub mainchain_tx: Option<hal::tx::TransactionInfo>,
 	pub merkle_proof: HexBytes,
-	pub referenced_block: HexBytes,
+	pub referenced_block: sha256d::Hash,
 }
 
 impl<'tx> GetInfo<PeginDataInfo> for PeginData<'tx> {
@@ -49,7 +49,7 @@ impl<'tx> GetInfo<PeginDataInfo> for PeginData<'tx> {
 			outpoint: self.outpoint.to_string(),
 			value: self.value,
 			asset: self.asset.get_info(network),
-			genesis_hash: self.genesis_hash[..].into(),
+			genesis_hash: self.genesis_hash,
 			claim_script: self.claim_script.into(),
 			mainchain_tx_hex: self.tx.into(),
 			mainchain_tx: match deserialize(&self.tx) {
@@ -57,7 +57,7 @@ impl<'tx> GetInfo<PeginDataInfo> for PeginData<'tx> {
 				Err(_) => None,
 			},
 			merkle_proof: self.merkle_proof.into(),
-			referenced_block: self.referenced_block[..].into(),
+			referenced_block: self.referenced_block,
 		}
 	}
 }
@@ -141,7 +141,7 @@ impl GetInfo<InputInfo> for TxIn {
 pub struct PegoutDataInfo {
 	pub value: u64,
 	pub asset: ConfidentialAssetInfo,
-	pub genesis_hash: HexBytes,
+	pub genesis_hash: sha256d::Hash,
 	pub script_pub_key: OutputScriptInfo,
 	pub extra_data: Vec<HexBytes>,
 }
@@ -151,7 +151,7 @@ impl<'tx> GetInfo<PegoutDataInfo> for PegoutData<'tx> {
 		PegoutDataInfo {
 			value: self.value,
 			asset: self.asset.get_info(network),
-			genesis_hash: self.genesis_hash[..].into(),
+			genesis_hash: self.genesis_hash,
 			script_pub_key: OutputScript(&self.script_pubkey).get_info(network),
 			extra_data: self.extra_data.iter().map(|w| w.clone().into()).collect(),
 		}

@@ -1,4 +1,5 @@
 use bitcoin::Network;
+use bitcoin_hashes::sha256d;
 use elements::confidential::{Asset, Nonce, Value};
 
 use hal::{GetInfo, HexBytes};
@@ -51,7 +52,7 @@ pub struct ConfidentialAssetInfo {
 	#[serde(rename = "type")]
 	pub type_: ConfidentialType,
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub asset: Option<HexBytes>,
+	pub asset: Option<sha256d::Hash>,
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub commitment: Option<HexBytes>,
 }
@@ -65,7 +66,7 @@ impl GetInfo<ConfidentialAssetInfo> for Asset {
 				Asset::Confidential(_, _) => ConfidentialType::Confidential,
 			},
 			asset: match self {
-				Asset::Explicit(a) => Some(a[..].into()),
+				Asset::Explicit(a) => Some(*a),
 				_ => None,
 			},
 			commitment: match self {
@@ -86,7 +87,7 @@ pub struct ConfidentialNonceInfo {
 	#[serde(rename = "type")]
 	pub type_: ConfidentialType,
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub nonce: Option<HexBytes>,
+	pub nonce: Option<sha256d::Hash>,
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub commitment: Option<HexBytes>,
 }
@@ -100,7 +101,7 @@ impl GetInfo<ConfidentialNonceInfo> for Nonce {
 				Nonce::Confidential(_, _) => ConfidentialType::Confidential,
 			},
 			nonce: match self {
-				Nonce::Explicit(n) => Some(n[..].into()),
+				Nonce::Explicit(n) => Some(*n),
 				_ => None,
 			},
 			commitment: match self {
