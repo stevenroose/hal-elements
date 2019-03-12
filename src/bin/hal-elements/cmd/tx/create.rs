@@ -1,4 +1,3 @@
-use std::convert::TryInto;
 use std::io::Write;
 
 use bitcoin::consensus::encode::serialize;
@@ -59,9 +58,21 @@ fn outpoint_from_input_info(input: &InputInfo) -> OutPoint {
 	}
 }
 
+fn bytes_32(bytes: &[u8]) -> Option<[u8; 32]> {
+	if bytes.len() != 32 {
+		None
+	} else {
+		let mut array = [0; 32];
+		for (x, y) in bytes.iter().zip(array.iter_mut()) {
+			*y = *x;
+		}
+		Some(array)
+	}
+}
+
 fn create_commitment(bytes: Option<hal::HexBytes>) -> (u8, [u8; 32]) {
 	let comm = &bytes.expect("Field \"commitment\" is required for confidential values.").0[..];
-	(comm[0], comm[1..33].try_into().expect("Invalid size of \"commitment\"."))
+	(comm[0], bytes_32(&comm[1..33]).expect("Invalid size of \"commitment\"."))
 }
 
 fn create_confidential_value(info: ConfidentialValueInfo) -> confidential::Value {
@@ -105,18 +116,20 @@ fn create_confidential_nonce(info: ConfidentialNonceInfo) -> confidential::Nonce
 
 fn create_asset_issuance(info: AssetIssuanceInfo) -> AssetIssuance {
 	AssetIssuance {
-		asset_blinding_nonce: info
-			.asset_blinding_nonce
-			.expect("Field \"asset_blinding_nonce\" is required for asset issuances.")
-			.0[..]
-			.try_into()
-			.expect("Invalid size of \"asset_blinding_nonce\"."),
-		asset_entropy: info
-			.asset_entropy
-			.expect("Field \"asset_entropy\" is required for asset issuances.")
-			.0[..]
-			.try_into()
-			.expect("Invalid size of \"asset_entropy\"."),
+		asset_blinding_nonce: bytes_32(
+			&info
+				.asset_blinding_nonce
+				.expect("Field \"asset_blinding_nonce\" is required for asset issuances.")
+				.0[..],
+		)
+		.expect("Invalid size of \"asset_blinding_nonce\"."),
+		asset_entropy: bytes_32(
+			&info
+				.asset_entropy
+				.expect("Field \"asset_entropy\" is required for asset issuances.")
+				.0[..],
+		)
+		.expect("Invalid size of \"asset_entropy\"."),
 		amount: create_confidential_value(
 			info.amount.expect("Field \"amount\" is required for asset issuances."),
 		),
