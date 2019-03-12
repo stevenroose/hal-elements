@@ -1,7 +1,14 @@
 hal-elements -- an Elements extension of hal
 ============================================
 
-hal is a command line tool that provides all kinds of Bitcoin-related utilities.
+An extension of [hal](https://github.com/stevenroose/hal).
+
+# Installation
+
+```
+$ cargo install hal
+$ cargo install hal-elements
+```
 
 
 # Summary of commands:
