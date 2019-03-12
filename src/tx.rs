@@ -3,7 +3,8 @@ use bitcoin::util::hash::BitcoinHash;
 use bitcoin::Network; //TODO(stevenroose) replace with bitcoin_constants
 use bitcoin_hashes::sha256d;
 use elements::{
-	AssetIssuance, PeginData, PegoutData, Transaction, TxIn, TxInWitness, TxOut, TxOutWitness,
+	confidential, AssetIssuance, PeginData, PegoutData, Transaction, TxIn, TxInWitness, TxOut,
+	TxOutWitness,
 };
 
 use hal::tx::{InputScript, InputScriptInfo, OutputScript, OutputScriptInfo};
@@ -181,6 +182,7 @@ pub struct OutputInfo {
 	pub value: Option<ConfidentialValueInfo>,
 	pub nonce: Option<ConfidentialNonceInfo>,
 	pub witness: Option<OutputWitnessInfo>,
+	pub is_fee: bool,
 
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub pegout_data: Option<PegoutDataInfo>,
@@ -188,13 +190,28 @@ pub struct OutputInfo {
 
 impl GetInfo<OutputInfo> for TxOut {
 	fn get_info(&self, network: Network) -> OutputInfo {
+		let is_fee = {
+			// An output is fee if both the asset and the value are explicit
+			// and if the output script is empty.
+			let exp_ass = match self.asset {
+				confidential::Asset::Explicit(_) => true,
+				_ => false,
+			};
+			let exp_val = match self.value {
+				confidential::Value::Explicit(_) => true,
+				_ => false,
+			};
+
+			exp_ass && exp_val && self.script_pubkey.len() == 0
+		};
+
 		OutputInfo {
 			script_pub_key: Some(OutputScript(&self.script_pubkey).get_info(network)),
-
 			asset: Some(self.asset.get_info(network)),
 			value: Some(self.value.get_info(network)),
 			nonce: Some(self.nonce.get_info(network)),
 			witness: Some(self.witness.get_info(network)),
+			is_fee: is_fee,
 			pegout_data: self.pegout_data().map(|p| p.get_info(network)),
 		}
 	}
