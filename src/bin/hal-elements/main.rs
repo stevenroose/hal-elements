@@ -1,15 +1,11 @@
 extern crate bitcoin;
-extern crate bitcoin_bech32;
 extern crate bitcoin_hashes;
-extern crate lightning_invoice;
 #[macro_use]
 extern crate log;
-extern crate base64;
 extern crate clap;
 extern crate elements;
 extern crate fern;
 extern crate hex;
-extern crate secp256k1;
 extern crate serde_json;
 
 extern crate hal;

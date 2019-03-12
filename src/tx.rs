@@ -6,6 +6,7 @@ use elements::{
 	confidential, AssetIssuance, PeginData, PegoutData, Transaction, TxIn, TxInWitness, TxOut,
 	TxOutWitness,
 };
+use serde::{Deserialize, Serialize};
 
 use hal::tx::{InputScript, InputScriptInfo, OutputScript, OutputScriptInfo};
 use hal::{GetInfo, HexBytes};

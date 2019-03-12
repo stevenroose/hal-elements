@@ -1,6 +1,7 @@
 use bitcoin::Network;
 use bitcoin_hashes::sha256d;
 use elements::confidential::{Asset, Nonce, Value};
+use serde::{Deserialize, Serialize};
 
 use hal::{GetInfo, HexBytes};
 
