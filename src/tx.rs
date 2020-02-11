@@ -1,7 +1,5 @@
-use bitcoin::consensus::encode::{deserialize, serialize};
-use bitcoin::util::hash::BitcoinHash;
+use elements::encode::serialize;
 use bitcoin::Network; //TODO(stevenroose) replace with bitcoin_constants
-use bitcoin_hashes::sha256d;
 use elements::{
 	confidential, AssetIssuance, PeginData, PegoutData, Transaction, TxIn, TxInWitness, TxOut,
 	TxOutWitness,
@@ -37,12 +35,12 @@ pub struct PeginDataInfo {
 	pub outpoint: String,
 	pub value: u64,
 	pub asset: ConfidentialAssetInfo,
-	pub genesis_hash: sha256d::Hash,
+	pub genesis_hash: bitcoin::BlockHash,
 	pub claim_script: HexBytes,
 	pub mainchain_tx_hex: HexBytes,
 	pub mainchain_tx: Option<hal::tx::TransactionInfo>,
 	pub merkle_proof: HexBytes,
-	pub referenced_block: sha256d::Hash,
+	pub referenced_block: bitcoin::BlockHash,
 }
 
 impl<'tx> GetInfo<PeginDataInfo> for PeginData<'tx> {
@@ -54,7 +52,7 @@ impl<'tx> GetInfo<PeginDataInfo> for PeginData<'tx> {
 			genesis_hash: self.genesis_hash,
 			claim_script: self.claim_script.into(),
 			mainchain_tx_hex: self.tx.into(),
-			mainchain_tx: match deserialize(&self.tx) {
+			mainchain_tx: match bitcoin::consensus::encode::deserialize(&self.tx) {
 				Ok(tx) => Some(bitcoin::Transaction::get_info(&tx, network)),
 				Err(_) => None,
 			},
@@ -96,7 +94,7 @@ impl GetInfo<InputWitnessInfo> for TxInWitness {
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub struct InputInfo {
 	pub prevout: Option<String>,
-	pub txid: Option<sha256d::Hash>,
+	pub txid: Option<bitcoin::Txid>,
 	pub vout: Option<u32>,
 	pub script_sig: Option<InputScriptInfo>,
 	pub sequence: Option<u32>,
@@ -143,7 +141,7 @@ impl GetInfo<InputInfo> for TxIn {
 pub struct PegoutDataInfo {
 	pub value: u64,
 	pub asset: ConfidentialAssetInfo,
-	pub genesis_hash: sha256d::Hash,
+	pub genesis_hash: bitcoin::BlockHash,
 	pub script_pub_key: OutputScriptInfo,
 	pub extra_data: Vec<HexBytes>,
 }
@@ -220,8 +218,9 @@ impl GetInfo<OutputInfo> for TxOut {
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub struct TransactionInfo {
-	pub txid: Option<sha256d::Hash>,
-	pub hash: Option<sha256d::Hash>,
+	pub txid: Option<bitcoin::Txid>,
+	pub wtxid: Option<bitcoin::Wtxid>,
+	pub hash: Option<bitcoin::Wtxid>,
 	pub size: Option<usize>,
 	pub weight: Option<usize>,
 	pub vsize: Option<usize>,
@@ -235,7 +234,8 @@ impl GetInfo<TransactionInfo> for Transaction {
 	fn get_info(&self, network: Network) -> TransactionInfo {
 		TransactionInfo {
 			txid: Some(self.txid()),
-			hash: Some(self.bitcoin_hash()),
+			wtxid: Some(self.wtxid()),
+			hash: Some(self.wtxid()),
 			version: Some(self.version),
 			locktime: Some(self.lock_time),
 			size: Some(serialize(self).len()),

@@ -1,5 +1,4 @@
 extern crate bitcoin;
-extern crate bitcoin_hashes;
 #[macro_use]
 extern crate log;
 extern crate clap;

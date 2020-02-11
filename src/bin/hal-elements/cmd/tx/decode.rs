@@ -1,4 +1,4 @@
-use bitcoin::consensus::encode::deserialize;
+use elements::encode::deserialize;
 use clap;
 use elements::Transaction;
 
