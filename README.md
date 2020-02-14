@@ -6,12 +6,15 @@ An extension of [hal](https://github.com/stevenroose/hal).
 # Installation
 
 ```
-$ cargo install hal
-$ cargo install hal-elements
+$ cargo install hal hal-elements
 ```
 
 
 # Summary of commands:
+
+- block
+	- create: create a binary block from JSON
+	- decode: decode a binary block to JSON
 
 - tx
 	- create: create a binary transaction from JSON
