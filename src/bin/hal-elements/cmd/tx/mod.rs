@@ -2,7 +2,7 @@ use clap;
 
 use cmd;
 
-mod create;
+pub mod create;
 mod decode;
 
 pub fn subcommand<'a>() -> clap::App<'a, 'a> {

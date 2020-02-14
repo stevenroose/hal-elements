@@ -3,6 +3,7 @@
 //pub mod ln;
 //pub mod psbt;
 //pub mod script;
+pub mod block;
 pub mod tx;
 
 use bitcoin::Network;
@@ -15,6 +16,7 @@ pub fn subcommands<'a>() -> Vec<clap::App<'a, 'a>> {
 		//psbt::subcommand(),
 		//script::subcommand(),
 		//bip32::subcommand(),
+		block::subcommand(),
 		tx::subcommand(),
 	]
 }
