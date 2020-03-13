@@ -1,8 +1,8 @@
 use std::io::Write;
 
-use elements::encode::serialize;
-use bitcoin::{Network, Script};
 use bitcoin::hashes::Hash;
+use bitcoin::{Network, Script};
+use elements::encode::serialize;
 use elements::{
 	confidential, AssetIssuance, OutPoint, Transaction, TxIn, TxInWitness, TxOut, TxOutWitness,
 };

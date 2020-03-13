@@ -1,5 +1,5 @@
-use elements::encode::serialize;
 use bitcoin::Network; //TODO(stevenroose) replace with bitcoin_constants
+use elements::encode::serialize;
 use elements::{
 	confidential, AssetIssuance, PeginData, PegoutData, Transaction, TxIn, TxInWitness, TxOut,
 	TxOutWitness,

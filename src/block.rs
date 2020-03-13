@@ -1,7 +1,7 @@
 use bitcoin::hashes::sha256;
 use bitcoin::util::hash::BitcoinHash;
 use bitcoin::{BlockHash, Network, TxMerkleNode, Txid};
-use elements::{dynafed, Block, BlockHeader, BlockExtData};
+use elements::{dynafed, Block, BlockExtData, BlockHeader};
 use serde::{Deserialize, Serialize};
 
 use hal::{GetInfo, HexBytes};
@@ -9,7 +9,7 @@ use hal::{GetInfo, HexBytes};
 use tx::TransactionInfo;
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")] 
+#[serde(rename_all = "lowercase")]
 pub enum ParamsType {
 	Null,
 	Compact,
@@ -45,15 +45,21 @@ impl<'a> GetInfo<ParamsInfo> for dynafed::Params {
 		ParamsInfo {
 			params_type: match self {
 				dynafed::Params::Null => ParamsType::Null,
-				dynafed::Params::Compact{..} => ParamsType::Compact,
-				dynafed::Params::Full{..} => ParamsType::Full,
+				dynafed::Params::Compact {
+					..
+				} => ParamsType::Compact,
+				dynafed::Params::Full {
+					..
+				} => ParamsType::Full,
 			},
 			signblockscript: self.signblockscript().map(|s| s.to_bytes().into()),
 			signblock_witness_limit: self.signblock_witness_limit(),
 			elided_root: self.elided_root().map(|r| *r),
 			fedpeg_program: self.fedpeg_program().map(|p| p[..].into()),
 			fedpeg_script: self.fedpegscript().map(|s| s[..].into()),
-			extension_space: self.extension_space().map(|s| s.iter().map(|v| v[..].into()).collect()),
+			extension_space: self
+				.extension_space()
+				.map(|s| s.iter().map(|v| v[..].into()).collect()),
 		}
 	}
 }
@@ -92,16 +98,24 @@ impl<'a> GetInfo<BlockHeaderInfo> for BlockHeader {
 			..Default::default()
 		};
 		match self.ext {
-			BlockExtData::Proof {ref challenge, ref solution} => {
+			BlockExtData::Proof {
+				ref challenge,
+				ref solution,
+			} => {
 				info.dynafed = false;
 				info.legacy_challenge = Some(challenge.to_bytes().into());
 				info.legacy_solution = Some(solution.to_bytes().into());
 			}
-			BlockExtData::Dynafed {ref current, ref proposed, ref signblock_witness} => {
+			BlockExtData::Dynafed {
+				ref current,
+				ref proposed,
+				ref signblock_witness,
+			} => {
 				info.dynafed = true;
 				info.dynafed_current = Some(current.get_info(network));
 				info.dynafed_proposed = Some(proposed.get_info(network));
-				info.dynafed_witness = Some(signblock_witness.iter().map(|b| b[..].into()).collect());
+				info.dynafed_witness =
+					Some(signblock_witness.iter().map(|b| b[..].into()).collect());
 			}
 		};
 		info

@@ -1,5 +1,5 @@
-use elements::encode::deserialize;
 use clap;
+use elements::encode::deserialize;
 use elements::Transaction;
 
 use cmd;

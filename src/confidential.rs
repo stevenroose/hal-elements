@@ -1,5 +1,5 @@
-use bitcoin::Network;
 use bitcoin::hashes::sha256d;
+use bitcoin::Network;
 use elements::confidential::{Asset, Nonce, Value};
 use serde::{Deserialize, Serialize};
 
@@ -57,8 +57,9 @@ pub enum ConfidentialAssetLabel {
 impl ConfidentialAssetLabel {
 	pub fn from_asset_id(id: sha256d::Hash) -> Option<ConfidentialAssetLabel> {
 		match id.to_string().as_str() {
-			"6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d" =>
-				Some(ConfidentialAssetLabel::LiquidBitcoin),
+			"6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d" => {
+				Some(ConfidentialAssetLabel::LiquidBitcoin)
+			}
 			_ => None,
 		}
 	}
