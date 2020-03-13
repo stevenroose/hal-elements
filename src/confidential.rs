@@ -49,6 +49,22 @@ impl GetInfo<ConfidentialValueInfo> for Value {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ConfidentialAssetLabel {
+	LiquidBitcoin,
+}
+
+impl ConfidentialAssetLabel {
+	pub fn from_asset_id(id: sha256d::Hash) -> Option<ConfidentialAssetLabel> {
+		match id.to_string().as_str() {
+			"6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d" =>
+				Some(ConfidentialAssetLabel::LiquidBitcoin),
+			_ => None,
+		}
+	}
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub struct ConfidentialAssetInfo {
 	#[serde(rename = "type")]
 	pub type_: ConfidentialType,
@@ -56,6 +72,8 @@ pub struct ConfidentialAssetInfo {
 	pub asset: Option<sha256d::Hash>,
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub commitment: Option<HexBytes>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub label: Option<ConfidentialAssetLabel>,
 }
 
 impl GetInfo<ConfidentialAssetInfo> for Asset {
@@ -77,6 +95,10 @@ impl GetInfo<ConfidentialAssetInfo> for Asset {
 					commitment.extend(c);
 					Some(commitment[..].into())
 				}
+				_ => None,
+			},
+			label: match self {
+				Asset::Explicit(a) => ConfidentialAssetLabel::from_asset_id(*a),
 				_ => None,
 			},
 		}
