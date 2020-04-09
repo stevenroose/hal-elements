@@ -181,7 +181,7 @@ pub struct OutputInfo {
 	pub value: Option<ConfidentialValueInfo>,
 	pub nonce: Option<ConfidentialNonceInfo>,
 	pub witness: Option<OutputWitnessInfo>,
-	pub is_fee: bool,
+	pub is_fee: Option<bool>,
 
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub pegout_data: Option<PegoutDataInfo>,
@@ -210,7 +210,7 @@ impl GetInfo<OutputInfo> for TxOut {
 			value: Some(self.value.get_info(network)),
 			nonce: Some(self.nonce.get_info(network)),
 			witness: Some(self.witness.get_info(network)),
-			is_fee: is_fee,
+			is_fee: Some(is_fee),
 			pegout_data: self.pegout_data().map(|p| p.get_info(network)),
 		}
 	}
