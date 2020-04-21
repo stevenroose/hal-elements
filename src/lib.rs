@@ -4,6 +4,7 @@ extern crate hal;
 extern crate hex;
 extern crate serde;
 
+pub mod assets;
 pub mod block;
 pub mod tx;
 
