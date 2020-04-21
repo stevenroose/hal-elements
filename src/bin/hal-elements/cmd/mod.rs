@@ -3,6 +3,7 @@
 //pub mod ln;
 //pub mod psbt;
 //pub mod script;
+pub mod assets;
 pub mod block;
 pub mod tx;
 
@@ -16,6 +17,7 @@ pub fn subcommands<'a>() -> Vec<clap::App<'a, 'a>> {
 		//psbt::subcommand(),
 		//script::subcommand(),
 		//bip32::subcommand(),
+		assets::subcommand(),
 		block::subcommand(),
 		tx::subcommand(),
 	]

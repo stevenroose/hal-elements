@@ -57,6 +57,7 @@ fn execute_builtin<'a>(matches: &clap::ArgMatches<'a>) -> bool {
 		//("ln", Some(ref m)) => cmd::ln::execute(&m),
 		//("psbt", Some(ref m)) => cmd::psbt::execute(&m),
 		//("script", Some(ref m)) => cmd::script::execute(&m),
+		("assets", Some(ref m)) => cmd::assets::execute(&m),
 		("block", Some(ref m)) => cmd::block::execute(&m),
 		("tx", Some(ref m)) => cmd::tx::execute(&m),
 		_ => return false,
