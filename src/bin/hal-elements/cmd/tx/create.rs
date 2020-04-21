@@ -104,9 +104,15 @@ fn create_confidential_asset(info: ConfidentialAssetInfo) -> confidential::Asset
 fn create_confidential_nonce(info: ConfidentialNonceInfo) -> confidential::Nonce {
 	match info.type_ {
 		ConfidentialType::Null => confidential::Nonce::Null,
-		ConfidentialType::Explicit => confidential::Nonce::Explicit(
-			info.nonce.expect("Field \"nonce\" is required for explicit nonces."),
-		),
+		ConfidentialType::Explicit => {
+			let hex = info.nonce.expect("Field \"nonce\" is required for explicit nonces.");
+			if hex.0.len() != 32 {
+				panic!("Confidential nonce must be 32 bytes long");
+			}
+			let mut nonce = [0; 32];
+			nonce.copy_from_slice(&hex.0[..]);
+			confidential::Nonce::Explicit(nonce)
+		},
 		ConfidentialType::Confidential => {
 			let comm = create_commitment(info.commitment);
 			confidential::Nonce::Confidential(comm.0, comm.1)
