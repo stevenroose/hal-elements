@@ -4,7 +4,7 @@ use elements::encode::{deserialize, serialize};
 use elements::{dynafed, Block, BlockExtData, BlockHeader};
 
 use cmd;
-use cmd::tx::create::create_transaction;
+use cmd::tx::create_transaction;
 use hal_elements::block::{BlockHeaderInfo, BlockInfo, ParamsInfo, ParamsType};
 
 pub fn subcommand<'a>() -> clap::App<'a, 'a> {
