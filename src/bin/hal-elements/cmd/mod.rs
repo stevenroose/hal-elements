@@ -6,7 +6,7 @@
 pub mod block;
 pub mod tx;
 
-use bitcoin::Network;
+use hal_elements::Network;
 
 /// Build a list of all built-in subcommands.
 pub fn subcommands<'a>() -> Vec<clap::App<'a, 'a>> {
@@ -53,27 +53,27 @@ pub fn subcommand<'a>(name: &'static str, about: &'static str) -> clap::App<'a, 
 
 pub fn opts_networks<'a>() -> Vec<clap::Arg<'a, 'a>> {
 	vec![
-		clap::Arg::with_name("testnet")
-			.long("testnet")
-			.short("t")
-			.help("run in testnet mode")
+		clap::Arg::with_name("elementsregtest")
+			.long("elementsregtest")
+			.short("r")
+			.help("run in elementsregtest mode")
 			.takes_value(false)
 			.required(false),
-		clap::Arg::with_name("regtest")
-			.long("regtest")
-			.help("run in regtest mode")
+		clap::Arg::with_name("liquid")
+			.long("liquid")
+			.help("run in liquid mode")
 			.takes_value(false)
 			.required(false),
 	]
 }
 
 pub fn network<'a>(matches: &clap::ArgMatches<'a>) -> Network {
-	if matches.is_present("testnet") {
-		Network::Testnet
-	} else if matches.is_present("regtest") {
-		Network::Regtest
+	if matches.is_present("elementsregtest") {
+		Network::ElementsRegtest
+	} else if matches.is_present("liquid") {
+		Network::Liquid
 	} else {
-		Network::Bitcoin
+		Network::ElementsRegtest
 	}
 }
 

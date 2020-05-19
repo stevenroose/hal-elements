@@ -1,10 +1,10 @@
 use bitcoin::hashes::sha256;
 use bitcoin::util::hash::BitcoinHash;
-use bitcoin::{BlockHash, Network, TxMerkleNode, Txid};
+use bitcoin::{BlockHash, TxMerkleNode, Txid};
 use elements::{dynafed, Block, BlockExtData, BlockHeader};
 use serde::{Deserialize, Serialize};
 
-use hal::{GetInfo, HexBytes};
+use ::{GetInfo, Network, HexBytes};
 
 use tx::TransactionInfo;
 

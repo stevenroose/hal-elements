@@ -144,14 +144,14 @@ fn exec_decode<'a>(matches: &clap::ArgMatches<'a>) {
 
 	if matches.is_present("txids") {
 		let info = BlockInfo {
-			header: hal::GetInfo::get_info(&block.header, cmd::network(matches)),
+			header: ::GetInfo::get_info(&block.header, cmd::network(matches)),
 			txids: Some(block.txdata.iter().map(|t| t.txid()).collect()),
 			transactions: None,
 			raw_transactions: None,
 		};
 		cmd::print_output(matches, &info)
 	} else {
-		let info = hal::GetInfo::get_info(&block, cmd::network(matches));
+		let info = ::GetInfo::get_info(&block, cmd::network(matches));
 		cmd::print_output(matches, &info)
 	}
 }

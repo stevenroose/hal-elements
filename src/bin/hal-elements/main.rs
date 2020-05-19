@@ -14,6 +14,8 @@ use std::process;
 
 pub use elements::bitcoin;
 
+pub use hal_elements::{GetInfo, Network};
+
 pub mod cmd;
 
 /// Setup logging with the given log level.

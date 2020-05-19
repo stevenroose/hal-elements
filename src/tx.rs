@@ -1,15 +1,16 @@
-use elements::bitcoin::{self, Network}; //TODO(stevenroose) replace with bitcoin_constants
 use elements::encode::serialize;
 use elements::{
-	confidential, AssetIssuance, PeginData, PegoutData, Transaction, TxIn, TxInWitness, TxOut,
-	TxOutWitness,
+	bitcoin, confidential, AssetIssuance, PeginData, PegoutData, Transaction, TxIn, TxInWitness,
+	TxOut, TxOutWitness,
 };
 use serde::{Deserialize, Serialize};
 
 use hal::tx::{InputScript, InputScriptInfo, OutputScript, OutputScriptInfo};
-use hal::{GetInfo, HexBytes};
+use ::{GetInfo, Network, HexBytes};
 
 use confidential::{ConfidentialAssetInfo, ConfidentialNonceInfo, ConfidentialValueInfo};
+
+const BTCNET: elements::bitcoin::Network = elements::bitcoin::Network::Testnet;
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub struct AssetIssuanceInfo {
@@ -52,8 +53,8 @@ impl<'tx> GetInfo<PeginDataInfo> for PeginData<'tx> {
 			genesis_hash: self.genesis_hash,
 			claim_script: self.claim_script.into(),
 			mainchain_tx_hex: self.tx.into(),
-			mainchain_tx: match bitcoin::consensus::encode::deserialize(&self.tx) {
-				Ok(tx) => Some(bitcoin::Transaction::get_info(&tx, network)),
+			mainchain_tx: match bitcoin::consensus::encode::deserialize::<bitcoin::Transaction>(&self.tx) {
+				Ok(tx) => Some(hal::GetInfo::get_info(&tx, BTCNET)),
 				Err(_) => None,
 			},
 			merkle_proof: self.merkle_proof.into(),
@@ -118,7 +119,7 @@ impl GetInfo<InputInfo> for TxIn {
 			txid: Some(self.previous_output.txid),
 			vout: Some(self.previous_output.vout),
 			sequence: Some(self.sequence),
-			script_sig: Some(InputScript(&self.script_sig).get_info(network)),
+			script_sig: Some(hal::GetInfo::get_info(&InputScript(&self.script_sig), BTCNET)),
 
 			is_pegin: Some(self.is_pegin),
 			has_issuance: Some(self.has_issuance),
@@ -152,7 +153,7 @@ impl<'tx> GetInfo<PegoutDataInfo> for PegoutData<'tx> {
 			value: self.value,
 			asset: self.asset.get_info(network),
 			genesis_hash: self.genesis_hash,
-			script_pub_key: OutputScript(&self.script_pubkey).get_info(network),
+			script_pub_key: hal::GetInfo::get_info(&OutputScript(&self.script_pubkey), BTCNET),
 			extra_data: self.extra_data.iter().map(|w| w.clone().into()).collect(),
 		}
 	}
@@ -205,7 +206,7 @@ impl GetInfo<OutputInfo> for TxOut {
 		};
 
 		OutputInfo {
-			script_pub_key: Some(OutputScript(&self.script_pubkey).get_info(network)),
+			script_pub_key: Some(hal::GetInfo::get_info(&OutputScript(&self.script_pubkey), BTCNET)),
 			asset: Some(self.asset.get_info(network)),
 			value: Some(self.value.get_info(network)),
 			nonce: Some(self.nonce.get_info(network)),

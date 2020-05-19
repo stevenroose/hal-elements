@@ -1,9 +1,8 @@
 use bitcoin::hashes::sha256d;
-use bitcoin::Network;
 use elements::confidential::{Asset, Nonce, Value};
 use serde::{Deserialize, Serialize};
 
-use hal::{GetInfo, HexBytes};
+use ::{GetInfo, Network, HexBytes};
 
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
