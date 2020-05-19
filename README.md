@@ -12,6 +12,10 @@ $ cargo install hal hal-elements
 
 # Summary of commands:
 
+- address
+    - create: create addresses
+    - inspect: inspect addresses
+
 - block
 	- create: create a binary block from JSON
 	- decode: decode a binary block to JSON

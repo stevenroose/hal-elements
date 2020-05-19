@@ -1,8 +1,4 @@
-//pub mod address;
-//pub mod bip32;
-//pub mod ln;
-//pub mod psbt;
-//pub mod script;
+pub mod address;
 pub mod block;
 pub mod tx;
 
@@ -11,11 +7,7 @@ use hal_elements::Network;
 /// Build a list of all built-in subcommands.
 pub fn subcommands<'a>() -> Vec<clap::App<'a, 'a>> {
 	vec![
-		//address::subcommand(),
-		//ln::subcommand(),
-		//psbt::subcommand(),
-		//script::subcommand(),
-		//bip32::subcommand(),
+		address::subcommand(),
 		block::subcommand(),
 		tx::subcommand(),
 	]
