@@ -2,7 +2,7 @@ use std::io::Write;
 
 use clap;
 use bitcoin::hashes::Hash;
-use bitcoin::{Network, Script};
+use bitcoin::{self, Network, Script};
 use elements::encode::{deserialize, serialize};
 use elements::{
 	confidential, AssetIssuance, OutPoint, Transaction, TxIn, TxInWitness, TxOut, TxOutWitness,
@@ -43,12 +43,8 @@ fn cmd_create<'a>() -> clap::App<'a, 'a> {
 
 /// Check both ways to specify the outpoint and panic if conflicting.
 fn outpoint_from_input_info(input: &InputInfo) -> OutPoint {
-	let op1_btc: Option<bitcoin::OutPoint> =
+	let op1: Option<OutPoint> =
 		input.prevout.as_ref().map(|ref op| op.parse().expect("invalid prevout format"));
-	let op1 = op1_btc.map(|o| OutPoint {
-		txid: o.txid,
-		vout: o.vout,
-	});
 	let op2 = match input.txid {
 		Some(txid) => match input.vout {
 			Some(vout) => Some(OutPoint {
@@ -169,10 +165,7 @@ fn create_script_sig(ss: InputScriptInfo) -> Script {
 }
 
 fn create_pegin_witness(pd: PeginDataInfo, prevout: OutPoint) -> Vec<Vec<u8>> {
-	let btc_prev = bitcoin::OutPoint {
-		txid: prevout.txid,
-		vout: prevout.vout,
-	};
+	let btc_prev = bitcoin::OutPoint::new(prevout.txid, prevout.vout);
 	if btc_prev != pd.outpoint.parse().expect("Invalid outpoint in field \"pegin_data\".") {
 		panic!("Outpoint in \"pegin_data\" does not correspond to input value.");
 	}

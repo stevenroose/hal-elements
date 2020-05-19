@@ -1,4 +1,3 @@
-extern crate bitcoin;
 #[macro_use]
 extern crate log;
 extern crate clap;
@@ -12,6 +11,8 @@ extern crate hal_elements;
 
 use std::panic;
 use std::process;
+
+pub use elements::bitcoin;
 
 pub mod cmd;
 
