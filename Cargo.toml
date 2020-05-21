@@ -19,7 +19,7 @@ path = "src/bin/hal-elements/main.rs"
 
 
 [dependencies]
-hal = "0.5.2"
+hal = "0.7.0"
 clap = "2.32"
 log = "0.4.5"
 fern = "0.5.6"
