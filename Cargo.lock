@@ -270,7 +270,7 @@ dependencies = [
 
 [[package]]
 name = "hal-elements"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "clap 2.32.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "elements 0.12.1 (registry+https://github.com/rust-lang/crates.io-index)",
