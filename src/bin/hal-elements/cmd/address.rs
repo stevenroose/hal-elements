@@ -80,6 +80,15 @@ fn exec_inspect<'a>(matches: &clap::ArgMatches<'a>) {
 		witness_script_hash: None,
 		witness_program_version: None,
 		blinding_pubkey: address.blinding_pubkey,
+		unconfidential: if address.blinding_pubkey.is_some() {
+			Some(Address {
+				params: address.params,
+				payload: address.payload.clone(),
+				blinding_pubkey: None,
+			})
+		} else {
+			None
+		},
 	};
 
 	use elements::address::Payload;

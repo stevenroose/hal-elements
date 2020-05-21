@@ -22,6 +22,8 @@ pub struct AddressInfo {
 	pub witness_script_hash: Option<WScriptHash>,
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub blinding_pubkey: Option<secp256k1::PublicKey>,
+	#[serde(skip_serializing_if = "Option::is_none")]
+	pub unconfidential: Option<Address>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Default, Deserialize, Serialize)]
