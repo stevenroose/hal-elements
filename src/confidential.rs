@@ -1,5 +1,5 @@
-use bitcoin::hashes::sha256d;
 use elements::confidential::{Asset, Nonce, Value};
+use elements::AssetId;
 use serde::{Deserialize, Serialize};
 
 use ::{GetInfo, Network, HexBytes};
@@ -27,20 +27,15 @@ impl GetInfo<ConfidentialValueInfo> for Value {
 		ConfidentialValueInfo {
 			type_: match self {
 				Value::Null => ConfidentialType::Null,
-				Value::Explicit(_) => ConfidentialType::Explicit,
-				Value::Confidential(_, _) => ConfidentialType::Confidential,
+				Value::Explicit(..) => ConfidentialType::Explicit,
+				Value::Confidential(..) => ConfidentialType::Confidential,
 			},
 			value: match self {
 				Value::Explicit(v) => Some(*v),
 				_ => None,
 			},
 			commitment: match self {
-				Value::Confidential(p, c) => {
-					let mut commitment = Vec::new();
-					commitment.push(*p);
-					commitment.extend(c);
-					Some(commitment[..].into())
-				}
+				Value::Confidential(pk) => Some(pk.serialize()[..].into()),
 				_ => None,
 			},
 		}
@@ -54,7 +49,7 @@ pub enum ConfidentialAssetLabel {
 }
 
 impl ConfidentialAssetLabel {
-	pub fn from_asset_id(id: sha256d::Hash) -> Option<ConfidentialAssetLabel> {
+	pub fn from_asset_id(id: AssetId) -> Option<ConfidentialAssetLabel> {
 		match id.to_string().as_str() {
 			"6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d" => {
 				Some(ConfidentialAssetLabel::LiquidBitcoin)
@@ -69,7 +64,7 @@ pub struct ConfidentialAssetInfo {
 	#[serde(rename = "type")]
 	pub type_: ConfidentialType,
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub asset: Option<sha256d::Hash>,
+	pub asset: Option<AssetId>,
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub commitment: Option<HexBytes>,
 	#[serde(skip_serializing_if = "Option::is_none")]
@@ -81,20 +76,15 @@ impl GetInfo<ConfidentialAssetInfo> for Asset {
 		ConfidentialAssetInfo {
 			type_: match self {
 				Asset::Null => ConfidentialType::Null,
-				Asset::Explicit(_) => ConfidentialType::Explicit,
-				Asset::Confidential(_, _) => ConfidentialType::Confidential,
+				Asset::Explicit(..) => ConfidentialType::Explicit,
+				Asset::Confidential(..) => ConfidentialType::Confidential,
 			},
 			asset: match self {
 				Asset::Explicit(a) => Some(*a),
 				_ => None,
 			},
 			commitment: match self {
-				Asset::Confidential(p, c) => {
-					let mut commitment = Vec::new();
-					commitment.push(*p);
-					commitment.extend(c);
-					Some(commitment[..].into())
-				}
+				Asset::Confidential(pk) => Some(pk.serialize()[..].into()),
 				_ => None,
 			},
 			label: match self {
@@ -110,7 +100,7 @@ pub struct ConfidentialNonceInfo {
 	#[serde(rename = "type")]
 	pub type_: ConfidentialType,
 	#[serde(skip_serializing_if = "Option::is_none")]
-	pub nonce: Option<sha256d::Hash>,
+	pub nonce: Option<HexBytes>,
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub commitment: Option<HexBytes>,
 }
@@ -120,20 +110,15 @@ impl GetInfo<ConfidentialNonceInfo> for Nonce {
 		ConfidentialNonceInfo {
 			type_: match self {
 				Nonce::Null => ConfidentialType::Null,
-				Nonce::Explicit(_) => ConfidentialType::Explicit,
-				Nonce::Confidential(_, _) => ConfidentialType::Confidential,
+				Nonce::Explicit(..) => ConfidentialType::Explicit,
+				Nonce::Confidential(..) => ConfidentialType::Confidential,
 			},
 			nonce: match self {
-				Nonce::Explicit(n) => Some(*n),
+				Nonce::Explicit(n) => Some(n[..].into()),
 				_ => None,
 			},
 			commitment: match self {
-				Nonce::Confidential(p, c) => {
-					let mut commitment = Vec::new();
-					commitment.push(*p);
-					commitment.extend(c);
-					Some(commitment[..].into())
-				}
+				Nonce::Confidential(pk) => Some(pk.serialize()[..].into()),
 				_ => None,
 			},
 		}

@@ -1,6 +1,6 @@
 use bitcoin::hashes::Hash;
-use elements::Address;
-use bitcoin::{secp256k1, PublicKey, WPubkeyHash, WScriptHash};
+use elements::{Address, WPubkeyHash, WScriptHash};
+use bitcoin::{secp256k1, PublicKey};
 use clap;
 
 use cmd;

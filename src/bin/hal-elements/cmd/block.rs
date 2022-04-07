@@ -132,7 +132,7 @@ fn exec_create<'a>(matches: &clap::ArgMatches<'a>) {
 fn cmd_decode<'a>() -> clap::App<'a, 'a> {
 	cmd::subcommand("decode", "decode a raw block to JSON").args(&cmd::opts_networks()).args(&[
 		cmd::opt_yaml(),
-		cmd::arg("raw-block", "the raw block in hex").required(true),
+		cmd::arg("raw-block", "the raw block in hex").required(false),
 		cmd::opt("txids", "provide transactions IDs instead of full transactions"),
 	])
 }
