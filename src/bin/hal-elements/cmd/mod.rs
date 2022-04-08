@@ -2,6 +2,10 @@ pub mod address;
 pub mod block;
 pub mod tx;
 
+use std::io;
+use std::borrow::Cow;
+use std::io::Read;
+
 use hal_elements::Network;
 
 /// Build a list of all built-in subcommands.
@@ -76,6 +80,25 @@ pub fn opt_yaml<'a>() -> clap::Arg<'a, 'a> {
 		.help("print output in YAML instead of JSON")
 		.takes_value(false)
 		.required(false)
+}
+
+/// Get the named argument from the CLI arguments or try read from stdin if not provided.
+pub fn arg_or_stdin<'a>(matches: &'a clap::ArgMatches<'a>, arg: &str) -> Cow<'a, str> {
+	if let Some(s) = matches.value_of(arg) {
+		s.into()
+	} else {
+		// Read from stdin.
+		let mut input = Vec::new();
+		let stdin = io::stdin();
+		let mut stdin_lock = stdin.lock();
+		let _ = stdin_lock.read_to_end(&mut input);
+		while stdin_lock.read_to_end(&mut input).unwrap_or(0) > 0 {}
+		if input.is_empty() {
+			panic!("no '{}' argument given", arg);
+		}
+		String::from_utf8(input).expect(&format!("invalid utf8 on stdin for '{}'", arg))
+			.trim().to_owned().into()
+	}
 }
 
 pub fn print_output<'a, T: serde::Serialize>(matches: &clap::ArgMatches<'a>, out: &T) {

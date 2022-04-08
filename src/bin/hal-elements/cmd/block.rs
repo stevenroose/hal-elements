@@ -23,7 +23,7 @@ pub fn execute<'a>(matches: &clap::ArgMatches<'a>) {
 
 fn cmd_create<'a>() -> clap::App<'a, 'a> {
 	cmd::subcommand("create", "create a raw block from JSON").args(&[
-		cmd::arg("block-info", "the block info in JSON").required(true),
+		cmd::arg("block-info", "the block info in JSON").required(false),
 		cmd::opt("raw-stdout", "output the raw bytes of the result to stdout")
 			.short("r")
 			.required(false),
@@ -101,8 +101,8 @@ fn create_block_header(info: BlockHeaderInfo) -> BlockHeader {
 }
 
 fn exec_create<'a>(matches: &clap::ArgMatches<'a>) {
-	let json_block = matches.value_of("block-info").expect("no JSON blok info provided");
-	let info: BlockInfo = serde_json::from_str(json_block).expect("invalid JSON");
+	let info = serde_json::from_str::<BlockInfo>(&cmd::arg_or_stdin(matches, "block-info"))
+		.expect("invaid json JSON input");
 
 	if info.txids.is_some() {
 		warn!("Field \"txids\" is ignored.");
@@ -138,8 +138,8 @@ fn cmd_decode<'a>() -> clap::App<'a, 'a> {
 }
 
 fn exec_decode<'a>(matches: &clap::ArgMatches<'a>) {
-	let hex_tx = matches.value_of("raw-block").expect("no raw block provided");
-	let raw_tx = hex::decode(hex_tx).expect("could not decode raw block hex");
+	let hex_tx = cmd::arg_or_stdin(matches, "raw-block");
+	let raw_tx = hex::decode(hex_tx.as_ref()).expect("could not decode raw block hex");
 	let block: Block = deserialize(&raw_tx).expect("invalid block format");
 
 	if matches.is_present("txids") {
