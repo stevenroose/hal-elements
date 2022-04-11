@@ -32,7 +32,7 @@ fn setup_logger(lvl: log::LevelFilter) {
 fn init_app<'a, 'b>() -> clap::App<'a, 'b> {
 	clap::App::new("hal-elements")
 		.bin_name("hal")
-		.version("0.0.0")
+		.version(clap::crate_version!())
 		.author("Steven Roose <steven@stevenroose.org>")
 		.subcommand(
 			cmd::subcommand_group("elements", "an Elements extension for hal")
