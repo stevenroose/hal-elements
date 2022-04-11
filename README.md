@@ -6,7 +6,7 @@ An extension of [hal](https://github.com/stevenroose/hal).
 # Installation
 
 ```
-$ cargo install hal hal-elements
+$ cargo install --locked hal hal-elements
 ```
 
 
