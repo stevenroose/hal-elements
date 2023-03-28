@@ -1,3 +1,4 @@
+use std::convert::TryInto;
 use std::io::Write;
 
 use clap;
@@ -218,9 +219,9 @@ fn create_input_witness(
 	if let Some(wi) = info {
 		TxInWitness {
 			amount_rangeproof: wi.amount_rangeproof
-				.map(|b| RangeProof::from_slice(&b.0).expect("invalid rangeproof")),
+				.map(|b| Box::new(RangeProof::from_slice(&b.0).expect("invalid rangeproof"))),
 			inflation_keys_rangeproof: wi.inflation_keys_rangeproof
-				.map(|b| RangeProof::from_slice(&b.0).expect("invalid rangeproof")),
+				.map(|b| Box::new(RangeProof::from_slice(&b.0).expect("invalid rangeproof"))),
 			script_witness: match wi.script_witness {
 				Some(ref w) => w.iter().map(|h| h.clone().0).collect(),
 				None => Vec::new(),
@@ -243,9 +244,8 @@ fn create_input(input: InputInfo) -> TxIn {
 	TxIn {
 		previous_output: prevout,
 		script_sig: input.script_sig.map(create_script_sig).unwrap_or_default(),
-		sequence: input.sequence.unwrap_or_default(),
+		sequence: elements::Sequence::from_height(input.sequence.unwrap_or_default().try_into().unwrap()),
 		is_pegin: is_pegin,
-		has_issuance: has_issuance,
 		asset_issuance: if has_issuance {
 			input.asset_issuance.map(create_asset_issuance).unwrap_or_default()
 		} else {
@@ -324,10 +324,10 @@ fn create_bitcoin_script_pubkey(spk: hal::tx::OutputScriptInfo) -> bitcoin::Scri
 fn create_output_witness(w: OutputWitnessInfo) -> TxOutWitness {
 	TxOutWitness {
 		surjection_proof: w.surjection_proof.map(|b| {
-			SurjectionProof::from_slice(&b.0[..]).expect("invalid surjection proof")
+			Box::new(SurjectionProof::from_slice(&b.0[..]).expect("invalid surjection proof"))
 		}),
 		rangeproof: w.rangeproof.map(|b| {
-			RangeProof::from_slice(&b.0[..]).expect("invalid rangeproof")
+			Box::new(RangeProof::from_slice(&b.0[..]).expect("invalid rangeproof"))
 		}),
 	}
 }
@@ -407,7 +407,7 @@ pub fn create_transaction(info: TransactionInfo) -> Transaction {
 
 	Transaction {
 		version: info.version.expect("Field \"version\" is required."),
-		lock_time: info.locktime.expect("Field \"locktime\" is required."),
+		lock_time: elements::PackedLockTime(info.locktime.expect("Field \"locktime\" is required.")),
 		input: info
 			.inputs
 			.expect("Field \"inputs\" is required.")

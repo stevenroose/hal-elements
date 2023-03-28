@@ -62,7 +62,7 @@ impl<'a> GetInfo<ParamsInfo> for dynafed::Params {
 	}
 }
 
-#[derive(Clone, PartialEq, Eq, Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub struct BlockHeaderInfo {
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub block_hash: Option<BlockHash>,
@@ -93,7 +93,12 @@ impl<'a> GetInfo<BlockHeaderInfo> for BlockHeader {
 			merkle_root: self.merkle_root,
 			time: self.time,
 			height: self.height,
-			..Default::default()
+			dynafed: Default::default(),
+			legacy_challenge: Default::default(),
+			legacy_solution: Default::default(),
+			dynafed_current: Default::default(),
+			dynafed_proposed: Default::default(),
+			dynafed_witness: Default::default(),
 		};
 		match self.ext {
 			BlockExtData::Proof {

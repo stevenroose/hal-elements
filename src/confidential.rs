@@ -95,6 +95,17 @@ impl GetInfo<ConfidentialAssetInfo> for Asset {
 	}
 }
 
+impl GetInfo<ConfidentialAssetInfo> for AssetId {
+	fn get_info(&self, _network: Network) -> ConfidentialAssetInfo {
+		ConfidentialAssetInfo {
+			type_: ConfidentialType::Explicit,
+			asset: Some(*self),
+			commitment: None,
+			label: ConfidentialAssetLabel::from_asset_id(*self),
+		}
+	}
+}
+
 #[derive(Clone, PartialEq, Eq, Debug, Deserialize, Serialize)]
 pub struct ConfidentialNonceInfo {
 	#[serde(rename = "type")]
