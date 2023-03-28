@@ -3,6 +3,8 @@ use elements::{
 	bitcoin, confidential, AssetIssuance, PeginData, PegoutData, Transaction, TxIn, TxInWitness,
 	TxOut, TxOutWitness, Txid, Wtxid, Script, Address,
 };
+use elements::secp256k1_zkp::{RangeProof, SurjectionProof};
+
 use serde::{Deserialize, Serialize};
 
 use ::{GetInfo, Network, HexBytes};
@@ -75,8 +77,8 @@ pub struct InputWitnessInfo {
 impl GetInfo<InputWitnessInfo> for TxInWitness {
 	fn get_info(&self, _network: Network) -> InputWitnessInfo {
 		InputWitnessInfo {
-			amount_rangeproof: self.amount_rangeproof.as_ref().map(|r| r.serialize().into()),
-			inflation_keys_rangeproof: self.inflation_keys_rangeproof.as_ref().map(|r| r.serialize().into()),
+			amount_rangeproof: self.amount_rangeproof.as_ref().map(|r| RangeProof::serialize(r).into()),
+			inflation_keys_rangeproof: self.inflation_keys_rangeproof.as_ref().map(|r| RangeProof::serialize(r).into()),
 			script_witness: if self.script_witness.len() > 0 {
 				Some(self.script_witness.iter().map(|w| w.clone().into()).collect())
 			} else {
@@ -134,12 +136,12 @@ impl GetInfo<InputInfo> for TxIn {
 			prevout: Some(format!("{}:{}", self.previous_output.txid, self.previous_output.vout)),
 			txid: Some(self.previous_output.txid),
 			vout: Some(self.previous_output.vout),
-			sequence: Some(self.sequence),
+			sequence: Some(self.sequence.to_consensus_u32()),
 			script_sig: Some(::GetInfo::get_info(&InputScript(&self.script_sig), network)),
 
 			is_pegin: Some(self.is_pegin),
-			has_issuance: Some(self.has_issuance),
-			asset_issuance: if self.has_issuance {
+			has_issuance: Some(self.has_issuance()),
+			asset_issuance: if self.has_issuance() {
 				Some(self.asset_issuance.get_info(network))
 			} else {
 				None
@@ -184,8 +186,8 @@ pub struct OutputWitnessInfo {
 impl GetInfo<OutputWitnessInfo> for TxOutWitness {
 	fn get_info(&self, _network: Network) -> OutputWitnessInfo {
 		OutputWitnessInfo {
-			surjection_proof: self.surjection_proof.as_ref().map(|p| p.serialize().into()),
-			rangeproof: self.rangeproof.as_ref().map(|p| p.serialize().into()),
+			surjection_proof: self.surjection_proof.as_ref().map(|p| SurjectionProof::serialize(p).into()),
+			rangeproof: self.rangeproof.as_ref().map(|p| RangeProof::serialize(p).into()),
 		}
 	}
 }
@@ -295,10 +297,10 @@ impl GetInfo<TransactionInfo> for Transaction {
 			wtxid: Some(self.wtxid()),
 			hash: Some(self.wtxid()),
 			version: Some(self.version),
-			locktime: Some(self.lock_time),
+			locktime: Some(self.lock_time.to_u32()),
 			size: Some(serialize(self).len()),
-			weight: Some(self.get_weight() as usize),
-			vsize: Some((self.get_weight() / 4) as usize),
+			weight: Some(self.weight() as usize),
+			vsize: Some((self.weight() / 4) as usize),
 			inputs: Some(self.input.iter().map(|i| i.get_info(network)).collect()),
 			outputs: Some(self.output.iter().map(|o| o.get_info(network)).collect()),
 		}
