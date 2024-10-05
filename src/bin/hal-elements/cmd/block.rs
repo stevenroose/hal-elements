@@ -140,9 +140,9 @@ fn cmd_decode<'a>() -> clap::App<'a, 'a> {
 fn exec_decode<'a>(matches: &clap::ArgMatches<'a>) {
 	let hex_tx = cmd::arg_or_stdin(matches, "raw-block");
 	let raw_tx = hex::decode(hex_tx.as_ref()).expect("could not decode raw block hex");
-	let block: Block = deserialize(&raw_tx).expect("invalid block format");
 
 	if matches.is_present("txids") {
+		let block: Block = deserialize(&raw_tx).expect("invalid block format");
 		let info = BlockInfo {
 			header: ::GetInfo::get_info(&block.header, cmd::network(matches)),
 			txids: Some(block.txdata.iter().map(|t| t.txid()).collect()),
@@ -151,7 +151,14 @@ fn exec_decode<'a>(matches: &clap::ArgMatches<'a>) {
 		};
 		cmd::print_output(matches, &info)
 	} else {
-		let info = ::GetInfo::get_info(&block, cmd::network(matches));
+		let header: BlockHeader = match deserialize(&raw_tx) {
+			Ok(header) => header,
+			Err(_) => {
+				let block: Block = deserialize(&raw_tx).expect("invalid block format");
+				block.header
+			}
+		};
+		let info = ::GetInfo::get_info(&header, cmd::network(matches));
 		cmd::print_output(matches, &info)
 	}
 }
