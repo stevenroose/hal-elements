@@ -21,6 +21,7 @@ use serde::{Deserialize, Serialize};
 pub enum Network {
 	ElementsRegtest,
 	Liquid,
+	LiquidTestnet,
 }
 
 impl Network {
@@ -28,6 +29,7 @@ impl Network {
 		match params {
 			&AddressParams::ELEMENTS => Some(Network::ElementsRegtest),
 			&AddressParams::LIQUID => Some(Network::Liquid),
+			&AddressParams::LIQUID_TESTNET => Some(Network::LiquidTestnet),
 			_ => None,
 		}
 	}
@@ -36,6 +38,7 @@ impl Network {
 		match self {
 			Network::ElementsRegtest => &AddressParams::ELEMENTS,
 			Network::Liquid => &AddressParams::LIQUID,
+			Network::LiquidTestnet => &AddressParams::LIQUID_TESTNET,
 		}
 	}
 }

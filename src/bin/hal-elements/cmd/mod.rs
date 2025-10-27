@@ -59,6 +59,11 @@ pub fn opts_networks<'a>() -> Vec<clap::Arg<'a, 'a>> {
 			.help("run in liquid mode")
 			.takes_value(false)
 			.required(false),
+		clap::Arg::with_name("liquidtestnet")
+			.long("liquidtestnet")
+			.help("run in liquidtestnet mode")
+			.takes_value(false)
+			.required(false),
 	]
 }
 
@@ -67,6 +72,8 @@ pub fn network<'a>(matches: &clap::ArgMatches<'a>) -> Network {
 		Network::ElementsRegtest
 	} else if matches.is_present("liquid") {
 		Network::Liquid
+	} else if matches.is_present("liquidtestnet") {
+		Network::LiquidTestnet
 	} else {
 		Network::ElementsRegtest
 	}
